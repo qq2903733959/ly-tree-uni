@@ -1,5 +1,4 @@
-对lyTree 树组件进行改造加上自己需求  （有问题先看文档，导入工程示例看） 看官网 https://ext.dcloud.net.cn/plugin?id=1000
-·改编自element-UI，去掉了拖拽和动画，其他功能基本全部保留了，并且新增了单选功能，代码改动非常大；
+对lyTree 树组件进行改造加上自己需求 （有问题先看文档，导入工程示例看） 看官网 https://ext.dcloud.net.cn/plugin?id=1000 ·改编自element-UI，去掉了拖拽和动画，其他功能基本全部保留了，并且新增了单选功能，代码改动非常大；
 
 ·element-UI的树组件仅支持H5端，APP端无法给组件挂载深度嵌套的数据对象，所以做了处理，使用组件时必须配置nodeKey；
 
@@ -13,41 +12,98 @@
 
 不要带着问题打差评，有问题（或者通用需求）直接加我QQ，看到我都会回复的（另：谁也没有义务替你解决所有问题，过于客制化的需求需要自己实现一下）
 
-强烈建议将以下文档看完！！！强烈建议将以下文档看完！！！强烈建议将以下文档看完！！！导入示例项目看demo！！！
+# Daily reflection
 
-pages.json配置（非常重要！！！小程序和APP端只显示一个层级就是因为没有配置这个属性！！请使用复制粘贴！不要自己写错单词！）：
+### **lyTree 树组件（看文档！！！看文档！！！看文档！！！导入工程项目！有很多示例！）**
 
-"globalStyle": {
+### **重要！nvue版本已发布，在components/ly-tree-nvue中，功能与原始版本一致，样式有略微变动，欢迎下载使用，如有问题请加群及时反馈哦~~~**
+
+### **感谢小伙伴们的支持，请点个五星好评~~**
+
+**心灵脆弱的程序媛求好评~~~切勿做伸手党和喷子**
+
+**有问题可以直接加QQ群：1079028385，在群里沟通哦~~**
+
+**pages.json配置（非常重要！！！小程序和APP端只显示一个层级、无法展开就是因为没有配置这个属性！！请使用复制粘贴！不要自己写错单词！）：**
+
+提示：为了集中精力、减少包体积，2020年4月发布的HBuilderX 2.7版本起，及对应的App SDK包，将不再提供“自定义组件模式”。（uni小程序sdk本身也仅支持v3）。 经验证，如果项目只编译到APP端，这里可以不配置，但配置了也不回有影响，小程序端还是需要配置。
+
+综上：这里的配置建议总是加上，避免小程序端无法展开节点
+
+```jsx
+复制代码"globalStyle": {
         ...
         "usingComponents": {
             "ly-tree-node": "/components/ly-tree/ly-tree-node"
         }
     }
-App.vue中引入CSS（注意是App.vue全局引入！！）：
+```
 
-@import url("components/ly-tree/ly-tree.css");
-关于render-content：
+**关于render-content：**
 
 ·因为uni非H5端目前不支持render函数，插件依赖于uni,目前这个需求还无法实现，如果有特殊的需求需要自定义节点样式，可以自行修改ly-tree-node哦~；
 
-基本用法：
+**属性说明：**
+
+|属性名|类型|默认值|说明|
+|--|--|--|--|
+|nodeKey|String|-|必填，每个树节点用来作为唯一标识的属性，整棵树应该是唯一的|
+|treeData|Array|-|非懒加载时的展示数据|
+|emptyText|String|暂无数据|内容为空的时候展示的文本|
+|renderAfterExpand|Boolean|true|是否在第一次展开某个树节点后才渲染其子节点|
+|checkStrictly|Boolean|false|在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false，如果设置了checkOnlyLeaf为true，这里也将变为true|
+|defaultExpandAll|Boolean|false|是否默认展开所有节点|
+|expandOnClickNode|Boolean|true|是否在点击节点的时候展开或者收缩节点， 默认值为 true，如果为 false，则只有点箭头图标的时候才会展开或者收缩节点|
+|checkOnClickNode|Boolean|false|是否在点击节点的时候选中节点，默认值为 false，即只有在点击复选框时才会选中节点|
+|autoExpandParent|Boolean|true|是否在第一次展开某个树节点后才渲染其子节点|
+|defaultCheckedKeys|Array|-|默认勾选的节点的 key 的数组|
+|defaultExpandedKeys|Array|-|默认展开的节点的 key 的数组|
+|currentNodeKey|String, Number|-|当前选中的节点|
+|showCheckbox|Boolean|false|节点是否可被选择|
+|showRadio|Boolean|false|节点是否可被单选|
+|props|Object|见下文|数据中对应的属性名|
+|lazy|Boolean|false|是否懒加载子节点，需与 load 方法结合使用|
+|highlightCurrent|Boolean|false|是否高亮当前选中节点，默认值是 false|
+|load|Function|-|加载子树数据的方法，仅当 lazy 属性为true 时生效|
+|filterNodeMethod|Function|-|对树节点进行筛选时执行的方法，返回 true 表示这个节点可以显示，返回 false 则表示这个节点会被隐藏|
+|accordion|Boolean|false|是否每次只打开一个同级树节点展开|
+|indent|Number|18|相邻级节点间的水平缩进，单位为像素|
+|iconClass|String|-|自定义树节点的展开图标，图标class|
+|ready【新】|Boolean|true|自主控制loading加载，避免数据还没获取到的空档出现“暂无数据”字样|
+|showNodeIcon【新】|Boolean|false|是否显示节点图标，如果配置为true,需要配置props中对应的图标属性名称|
+|expandOnCheckNode【新】|Boolean|true|节点被选中时展开节点|
+|toggleExpendAll【新】|Boolean|false|切换全部展开、全部折叠|
+|childVisibleForFilterNode【新】|Boolean|false|搜索时是否展示匹配项的所有子节点|
+|checkOnlyLeaf【新】|Boolean|false|是否最后一层叶子节点才显示单选/多选框|
+|expandCurrentNodeParent【新】|Boolean|false|是否展开当前节点的父节点，设置当前节点时生效|
+|isInjectParentInNode【新】|Boolean|false|是否向node示例中挂载parent（父节点实例），如果配置为true，那么在点击或者展开节点等事件中能直接获取到parent;如果数据量较大，建议不要在node节点中添加parent属性，会造成性能损耗|
+|defaultNodeIcon【新】|String|-|当节点图标显示出错时，显示的默认图标|
+
+**基本用法：**
 
 ·请注意node-key必须配置，指数据中每个节点的唯一标志,打个比方：
 
-如果数据中以id数据项当做节点的唯一标志，node-key就是"id";
+```objectivec
+复制代码如果数据中以id数据项当做节点的唯一标志，node-key就是"id";
 
 如果数据中以guid数据项当做节点的唯一标志，node-key就是"guid";
 
 如果数据中以personId数据项当做节点的唯一标志，node-key就是"personId"...
-<template>
-    <ly-tree :tree-data="treeData" 
+```
+
+```html
+复制代码<template>
+    <ly-tree :tree-data="treeData"
         :ready="ready"
-        node-key="id" 
-        @node-expand="handleNodeExpand" 
+        node-key="id"
+        @node-expand="handleNodeExpand"
         @node-click="handleNodeClick">
         </ly-tree>
 </template>
-import LyTree from '@/components/ly-tree/ly-tree.vue'
+```
+
+```jsx
+复制代码import LyTree from '@/components/ly-tree/ly-tree.vue'
 export default {
     components: {
         LyTree
@@ -123,25 +179,33 @@ export default {
         }
     }
 };
-这个时候可能有人提出：如果我的数据结构不是{id: 11, label: 'xx', children: []}，而是{personId: 11, name: 'xx', childs: []},该怎么办？？以下props属性配置
+```
 
-props 属性说明：
+**这个时候可能有人提出：如果我的数据结构不是{id: 11, label: 'xx', children: []}，而是{personId: 11, name: 'xx', childs: []},该怎么办？？以下props属性配置**
 
-属性名	类型	默认值	说明
-label	string, function(data, node)	-	指定节点标签为节点对象的某个属性值
-icon[new]	String	-	指定节点图标为节点对象的某个属性值
-children	string	-	指定子树为节点对象的某个属性值
-disabled	String	boolean, function(data, node)	指定节点选择框是否禁用为节点对象的某个属性值
-isLeaf	boolean, function(data, node)	true	指定节点是否为叶子节点，仅在指定了 lazy 属性的情况下生效
-<template>
-    <ly-tree :tree-data="treeData" 
+**props 属性说明：**
+
+|属性名|类型|默认值|说明|
+|--|--|--|--|
+|label|string, function(data, node)|-|指定节点标签为节点对象的某个属性值|
+|icon[new]|String|-|指定节点图标为节点对象的某个属性值|
+|children|string|-|指定子树为节点对象的某个属性值|
+|disabled|String|boolean, function(data, node)|指定节点选择框是否禁用为节点对象的某个属性值|
+|isLeaf|boolean, function(data, node)|true|指定节点是否为叶子节点，仅在指定了 lazy 属性的情况下生效|
+
+```html
+复制代码<template>
+    <ly-tree :tree-data="treeData"
         :props="props"
-        node-key="personId" 
-        @node-expand="handleNodeExpand" 
+        node-key="personId"
+        @node-expand="handleNodeExpand"
         @node-click="handleNodeClick">
         </ly-tree>
 </template>
-import LyTree from '@/components/ly-tree/ly-tree.vue'
+```
+
+```jsx
+复制代码import LyTree from '@/components/ly-tree/ly-tree.vue'
 export default {
     components: {
         LyTree
@@ -225,15 +289,21 @@ export default {
         }
     }
 };
-懒加载：
+```
+
+**懒加载：**
 
 tips:为了确保页面加载完成后才去调用load方法，this指向正确,使用v-if懒加载树组件，在页面的onLoad之后调用
 
-<template>
+```html
+复制代码<template>
     <ly-tree v-if="isReady" :props="props" node-key="name" :load="loadNode" lazy>
     </ly-tree>
 </template>
-import LyTree from '@/components/ly-tree/ly-tree.vue'
+```
+
+```jsx
+复制代码import LyTree from '@/components/ly-tree/ly-tree.vue'
 
 var _self;
 export default {
@@ -285,11 +355,16 @@ export default {
         }
     }
 };
-方法说明：
+```
+
+**方法及事件：**
+
+以下是目前树支持的一些方法，更多详情请参见elementUI说明：https://element.eleme.cn/#/zh-CN/component/tree
 
 tips:为树组件绑定ref属性，如ref="tree"，则调用方式为this.$refs.tree.getCheckedNodes(),详情见工程示例“树节点的选择”
 
-/*
+```jsx
+复制代码/*
  * @description 对树节点进行筛选操作
  * @method filter
  * @param {all} value 在 filter-node-method 中作为第一个参数
@@ -336,10 +411,11 @@ getCheckedNodes(leafOnly, includeHalfChecked) {
  * @description 若节点可被选择（即 show-checkbox 为 true），则返回目前被选中的节点的 key 所组成的数组
  * @method getCheckedKeys
  * @param {Boolean} leafOnly 是否只是叶子节点，默认false,若为 true 则仅返回被选中的叶子节点的 keys
+ * @param {Boolean} includeHalfChecked 是否返回indeterminate为true的节点，默认false
  * @return {Array} 目前被选中的节点所组成的数组
 */
-getCheckedKeys(leafOnly) {
-    return this.store.getCheckedKeys(leafOnly);
+getCheckedKeys(leafOnly, includeHalfChecked) {
+    return this.store.getCheckedKeys(leafOnly, includeHalfChecked);
 },
 
 /*
@@ -363,6 +439,19 @@ getCurrentKey() {
 },
 
 /*
+ * @description 设置全选/取消全选
+ * @method setCheckAll
+ * @param {Boolean} isCheckAll 选中状态,默认为true
+*/
+setCheckAll(isCheckAll = true) {
+    if (this.showRadio) throw new Error('You set the "show-radio" property, so you cannot select all nodes');
+
+    if (!this.showCheckbox) console.warn('You have not set the property "show-checkbox". Please check your settings');
+
+    this.store.setCheckAll(isCheckAll);
+},
+
+/*
  * @description 设置目前勾选的节点
  * @method setCheckedNodes
  * @param {Array} nodes 接收勾选节点数据的数组
@@ -375,7 +464,7 @@ setCheckedNodes(nodes, leafOnly) {
 /*
  * @description 通过 keys 设置目前勾选的节点
  * @method setCheckedKeys
- * @param {Array} keys 勾选节点的 key 的数组 
+ * @param {Array} keys 勾选节点的 key 的数组
  * @param {Boolean} leafOnly 是否只是叶子节点, 若为 true 则仅设置叶子节点的选中状态，默认值为 false
 */
 setCheckedKeys(keys, leafOnly) {
@@ -386,7 +475,7 @@ setCheckedKeys(keys, leafOnly) {
 /*
  * @description 通过 key / data 设置某个节点的勾选状态
  * @method setChecked
- * @param {all} data 勾选节点的 key 或者 data 
+ * @param {all} data 勾选节点的 key 或者 data
  * @param {Boolean} checked 节点是否选中
  * @param {Boolean} deep 是否设置子节点 ，默认为 false
 */
@@ -453,7 +542,7 @@ remove(data) {
 /*
  * @description 为 Tree 中的一个节点追加一个子节点
  * @method append
- * @param {Object} data 要追加的子节点的 data 
+ * @param {Object} data 要追加的子节点的 data
  * @param {Object} parentNode 子节点的 parent 的 data、key 或者 node
 */
 append(data, parentNode) {
@@ -463,7 +552,7 @@ append(data, parentNode) {
 /*
  * @description 为 Tree 的一个节点的前面增加一个节点
  * @method insertBefore
- * @param {Object} data 要增加的节点的 data 
+ * @param {Object} data 要增加的节点的 data
  * @param {all} refNode 要增加的节点的后一个节点的 data、key 或者 node
 */
 insertBefore(data, refNode) {
@@ -473,7 +562,7 @@ insertBefore(data, refNode) {
 /*
  * @description 为 Tree 的一个节点的后面增加一个节点
  * @method insertAfter
- * @param {Object} data 要增加的节点的 data 
+ * @param {Object} data 要增加的节点的 data
  * @param {all} refNode 要增加的节点的前一个节点的 data、key 或者 node
 */
 insertAfter(data, refNode) {
@@ -483,56 +572,27 @@ insertAfter(data, refNode) {
 /*
  * @description 通过 keys 设置节点子元素
  * @method updateKeyChildren
- * @param {String, Number} key 节点 key 
+ * @param {String, Number} key 节点 key
  * @param {Object} data 节点数据的数组
 */
 updateKeyChildren(key, data) {
     if (!this.nodeKey) throw new Error('[Tree] nodeKey is required in updateKeyChild');
     this.store.updateChildren(key, data);
 }
-属性说明：
+```
 
-属性名	类型	默认值	说明
-nodeKey	String	-	必填，每个树节点用来作为唯一标识的属性，整棵树应该是唯一的
-treeData	Array	-	非懒加载时的展示数据
-ready[new]	Boolean	true	自主控制loading加载，避免数据还没获取到的空档出现“暂无数据”字样
-emptyText	String	暂无数据	内容为空的时候展示的文本
-renderAfterExpand	Boolean	true	是否在第一次展开某个树节点后才渲染其子节点
-checkStrictly	Boolean	false	在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false，如果设置了checkOnlyLeaf为true，这里也将变为true
-defaultExpandAll	Boolean	false	是否默认展开所有节点
-expandOnClickNode	Boolean	true	是否在点击节点的时候展开或者收缩节点， 默认值为 true，如果为 false，则只有点箭头图标的时候才会展开或者收缩节点
-checkOnClickNode	Boolean	false	是否在点击节点的时候选中节点，默认值为 false，即只有在点击复选框时才会选中节点
-autoExpandParent	Boolean	true	是否在第一次展开某个树节点后才渲染其子节点
-defaultCheckedKeys	Array	-	默认勾选的节点的 key 的数组
-defaultExpandedKeys	Array	-	默认展开的节点的 key 的数组
-currentNodeKey	String, Number	-	当前选中的节点
-showCheckbox	Boolean	false	节点是否可被选择
-showRadio	Boolean	false	节点是否可被单选
-checkOnlyLeaf[new]	Boolean	false	是否最后一层叶子节点才显示单选/多选框
-props	Object	见下文	数据中对应的属性名
-lazy	Boolean	false	是否懒加载子节点，需与 load 方法结合使用
-highlightCurrent	Boolean	false	是否高亮当前选中节点，默认值是 false
-load	Function	-	加载子树数据的方法，仅当 lazy 属性为true 时生效
-filterNodeMethod	Function	-	对树节点进行筛选时执行的方法，返回 true 表示这个节点可以显示，返回 false 则表示这个节点会被隐藏
-childVisibleForFilterNode[new]	Boolean	false	搜索时是否展示匹配项的所有子节点
-accordion	Boolean	false	是否每次只打开一个同级树节点展开
-indent	Number	18	相邻级节点间的水平缩进，单位为像素
-iconClass	String	-	自定义树节点的展开图标，图标class
-showNodeIcon[new]	Boolean	false	是否显示节点图标，如果配置为true,需要配置props中对应的图标属性名称
-版本更新：
+**说明：**
 
-版本	更新时间	更新说明
-1.01	2019-12-04	修复异步获取数据treeData不加载的问题
-1.02	2019-12-12	解决小程序手风琴不生效的bug 使用闭包方式解决多个树并存时，store对象被覆盖导致的一系列指向问题
-1.03	2019-12-16	修改样式class(iconfont => ly-iconfont)，避免与项目冲突
-1.04	2019-12-21	解决checkOnClickNode在单选中失效的bug 新增checkOnlyLeaf配置，当节点是最后一层叶子节点时才显示选择框
-1.05	2019-12-26	解决undefined is not an object (evaluating 'e.detail.args'); 的bug
-1.06	2019-12-27	uni全局监听事件加上唯一标志前缀，避免多个tree并存时监听到同一个事件
-1.07	2020-01-04	新增showNodeIcon，可配置是否显示节点图标，如果配置为true,需要配置props中对应的图标属性名称 新增childVisibleForFilterNode配置，可配置搜索时是否展示匹配项的所有子节点，默认false
-1.08	2020-01-05	新增搜索指定空节点功能及样例
-1.09	2020-02-08	解决HbuilderX2.5.1版本更新后由于底层编译机制变化导致APP端显示“暂无数据”的问题；新增ready属性已自主控制loading加载状态避免未获取到数据时显示“暂无数据”的问题；新增在抽屉/弹框中使用树组件的示例
-1.10	2020-02-20	修改了一个小bug
-1.11	2020-03-19	解决icon不支持class样式的问题，解决icon图标在APP端的显示问题 新增toggleExpendAll配置：切换全部展开、全部折叠
-1.12	2020-03-23	一些实现方式的调整，补充方法说明文档,样例样式改为普通css，避免部分用户需要安装sass插件才能运行
-1.13	2020-04-06	解决showRadio时，默认选中会选择多个的问题；支持props配置函数，返回配置对象，解决label属性等无法使用函数渲染的问题
-方法及事件： 参见elementUI说明：https://element.eleme.cn/#/zh-CN/component/tree
+·本插件改编自element-UI，去掉了拖拽和动画，其他功能基本全部保留了，并且新增了单选功能，代码改动非常大；
+
+·element-UI的树组件仅支持H5端，APP端无法给组件挂载深度嵌套的数据对象，所以做了处理，使用组件时必须配置nodeKey；
+
+·APP端语法很严格，各种奇怪的bug（但都解决了），做起来非常头疼，可能有些细节方面有些小问题，希望大家多多包涵~
+
+·因为本人工作非常忙，没有太多时间关注插件市场，所以如果有扩展需求或者bug，可以自己解决的尽量自己解决哟~
+
+·亲测H5端、APP端、微信小程序可用，其他小程序没测过，应该也没什么问题~~
+
+工作太忙了，没有时间详细的写文档，请移步element-UI官网，感谢大家的支持，多多包涵~~
+
+**版本更新：**
